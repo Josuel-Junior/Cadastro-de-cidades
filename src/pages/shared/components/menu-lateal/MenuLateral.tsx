@@ -2,18 +2,51 @@ import {
   Avatar,
   Divider,
   Drawer,
-  Icon,
   List,
-  ListItemButton,
   ListItemIcon,
   ListItemText,
   useTheme,
 } from "@mui/material";
-import InboxIcon from "@mui/icons-material/Inbox";
+import { ListItemButton } from "@mui/material";
+import { Icon } from "@mui/material";
 import React from "react";
 import { Box } from "@mui/system";
 import { IAppThemeProviderProps, useAppDrawerContext } from "../../contexts";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { useMatch, useNavigate, useResolvedPath } from "react-router-dom";
+interface IListItemLinkProps {
+  to: string;
+  label: string;
+  icon: string;
+  onClick: (() => void) | undefined;
+  // pode ser uma funcao ou undefined
+}
+const ListItemLink: React.FC<IListItemLinkProps> = ({
+  to,
+  icon,
+  label,
+  onClick,
+}) => {
+  const navigate = useNavigate();
+
+  const resolvedPath = useResolvedPath(to);
+  const match = useMatch({ path: resolvedPath.pathname, end: false });
+
+  const handleClick = () => {
+    navigate(to);
+    onClick?.();
+    //forma de ver se a função e undefined
+  };
+  return (
+    // se a rota foi resolvida -> on click
+    <ListItemButton selected={!!match} onClick={handleClick}>
+      <ListItemIcon>
+        <Icon>{icon}</Icon>
+      </ListItemIcon>
+      <ListItemText primary={label} />
+    </ListItemButton>
+  );
+};
 
 export const MenuLateral: React.FC<IAppThemeProviderProps> = ({ children }) => {
   // theme tem que estar dentro do copor da função
@@ -22,10 +55,15 @@ export const MenuLateral: React.FC<IAppThemeProviderProps> = ({ children }) => {
 
   const smDown = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const { isDrawerOpen, toggleOpenDrawer } = useAppDrawerContext();
+  const { isDrawerOpen, toggleOpenDrawer, drawerOption } =
+    useAppDrawerContext();
   return (
     <>
-      <Drawer open={isDrawerOpen} variant={smDown ? "temporary" : "permanent"} onClose={toggleOpenDrawer}>
+      <Drawer
+        open={isDrawerOpen}
+        variant={smDown ? "temporary" : "permanent"}
+        onClose={toggleOpenDrawer}
+      >
         <Box
           width={theme.spacing(28)}
           height="100%"
@@ -48,12 +86,15 @@ export const MenuLateral: React.FC<IAppThemeProviderProps> = ({ children }) => {
           <Divider />
           <Box flex={1}>
             <List component="nav">
-              <ListItemButton>
-                <ListItemIcon>
-                  <InboxIcon />
-                </ListItemIcon>
-                <ListItemText primary="Página inicial" />
-              </ListItemButton>
+              {drawerOption.map((drawerOptions) => (
+                <ListItemLink
+                  key={drawerOptions.path}
+                  icon={drawerOptions.icon}
+                  to={drawerOptions.path}
+                  label={drawerOptions.label}
+                  onClick={smDown ? toggleOpenDrawer : undefined}
+                />
+              ))}
             </List>
           </Box>
         </Box>
