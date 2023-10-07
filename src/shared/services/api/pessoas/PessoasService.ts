@@ -3,14 +3,14 @@ import { Api } from "../axios-config";
 
 interface IListagemPessoa {
   id: number;
-  EMAIL: string;
+  email: string;
   cidadeId: number;
   nomeCompleto: string;
 }
 
 interface IDetalhePessoa {
   id: number;
-  EMAIL: string;
+  email: string;
   cidadeId: number;
   nomeCompleto: string;
 }
@@ -25,7 +25,8 @@ const getAll = async (
   filter = ""
 ): Promise<TPessoasComTotalCount | Error> => {
   try {
-    const urlRelativa = `/pessoas?_page${page}&_limit=${Environment.LIMITE_DE_LINHAS}&nomecompleto_like${filter}`;
+    const urlRelativa = `http://localhost:3333/pessoas?_page${page}&_limit=${Environment.LIMITE_DE_LINHAS}&nomeCompleto_like=${filter}`;
+    console.log(filter);
     const { data, headers } = await Api.get(urlRelativa);
 
     if (data) {
@@ -45,6 +46,8 @@ const getAll = async (
     );
   }
 };
+
+
 
 const getById = async (id: number): Promise<IDetalhePessoa | Error> => {
 
