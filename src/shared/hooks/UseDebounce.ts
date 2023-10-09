@@ -15,9 +15,9 @@ export const useDebounce = (delay = 300, notDelayInFirstTime = true) => {
     // agora isFirstTime é false então execute a fn com time
       if(debouncing.current){
         clearTimeout(debouncing.current);
-        console.log("Referencia inserida no useRef e esvazida");
+        // console.log("Referencia inserida no useRef e esvazida");
       }
-      console.log("Não possui referencia ainda");
+      // console.log("Não possui referencia ainda");
       debouncing.current = setTimeout(() => { func();}, delay);
     }
   }, [delay]);
