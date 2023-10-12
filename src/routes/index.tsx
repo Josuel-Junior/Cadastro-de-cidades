@@ -4,7 +4,8 @@ import { useAppDrawerContext, useAppThemeContext } from "../shared/contexts";
 import { useEffect } from "react";
 import { 
   Dasboard,
-  ListagemDePessoas
+  ListagemDePessoas,
+  DetalheDePessoas
 } from "../pages";
 
 export const AppRoutes = () => {
@@ -30,7 +31,7 @@ export const AppRoutes = () => {
     <Routes>
       <Route path="/pagina-inicial" element={<Dasboard />} />
       <Route path="/pessoas" element={<ListagemDePessoas />} />
-      {/* <Route path="/pessoas/detalhe/:id" element={<Dasboard />} /> */}
+      <Route path="/pessoas/detalhe/:id" element={<DetalheDePessoas/>} />
 
       <Route path="*" element={<Navigate to="/pagina-inicial" />} />
 

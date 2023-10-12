@@ -1,18 +1,6 @@
 {
   "pessoas": [
     {
-      "id": 1,
-      "email": "Josuel@gmail.com",
-      "cidadeId": 1,
-      "nomeCompleto": "Josuel Junior Fonseca"
-    },
-    {
-      "id": 2,
-      "email": "Josuel@gmail.com",
-      "cidadeId": 1,
-      "nomeCompleto": "Jose Silva"
-    },
-    {
       "id": 3,
       "email": "Josuel@gmail.com",
       "cidadeId": 1,

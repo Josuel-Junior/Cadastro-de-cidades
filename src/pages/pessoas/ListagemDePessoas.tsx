@@ -10,8 +10,10 @@ import {
   TableFooter,
   LinearProgress,
   Pagination,
+  IconButton,
+  Icon,
 } from "@mui/material";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 
 import {
   IListagemPessoa,
@@ -26,6 +28,8 @@ export const ListagemDePessoas: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const { debounce } = useDebounce();
+
+  const navigate = useNavigate();
 
   const [rows, setRows] = useState<IListagemPessoa[]>([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -56,12 +60,28 @@ export const ListagemDePessoas: React.FC = () => {
     });
   }, [busca, pagina]);
 
+  const handleDelete = (id: number) => {
+    if (confirm("Realmente deseja apagar?")) {
+      PessoasService.deleteById(id).then((result) => {
+        if (result instanceof Error) {
+          alert(result.message);
+        } else {
+          setRows((oldRows) => [
+            ...oldRows.filter((oldRow) => oldRow.id !== id),
+          ]);
+          alert("Registro apagado com sucesso");
+        }
+      });
+    }
+  };
+
   return (
     <LayoutBaseDePagina
       title="Listagem de pessoas"
       barraDeFerramentas={
         <FerramentasDaListagem
           textoBotaoNovo="Nova"
+          aoClicarEmNovo={()=> navigate("/pessoas/detalhe/nova")}
           mostrarInputBusca
           textDaBusca={busca} // ?? mesmo que ||
           aoMudarTextoDeBusca={(texto) =>
@@ -86,14 +106,21 @@ export const ListagemDePessoas: React.FC = () => {
           <TableBody>
             {rows.map((row, id) => (
               <TableRow key={id}>
-                <TableCell>Ações</TableCell>
+                <TableCell>
+                  <IconButton size="small" onClick={() => handleDelete(row.id)}>
+                    <Icon>delete</Icon>
+                  </IconButton>
+                  <IconButton size="small" onClick={()=> navigate(`/pessoas/detalhe/${row.id}`)}>
+                    <Icon>edit</Icon>
+                  </IconButton>
+                </TableCell>
                 <TableCell>{row.nomeCompleto}</TableCell>
                 <TableCell>{row.email}</TableCell>
               </TableRow>
             ))}
           </TableBody>
           {/* SE VERDADEIRO E FALSO ENTÃO FAÇA */}
-          {totalCount === 0 && !isLoading &&(
+          {totalCount === 0 && !isLoading && (
             <caption>{Environment.LISTAGEM_VAZIA}</caption>
           )}
           <TableFooter>
@@ -104,13 +131,18 @@ export const ListagemDePessoas: React.FC = () => {
                 </TableCell>
               </TableRow>
             )}
-            {(totalCount > 0 && Environment.LIMITE_DE_LINHAS) && (
+            {totalCount > 0 && Environment.LIMITE_DE_LINHAS && (
               <TableRow>
                 <TableCell colSpan={3}>
-                  <Pagination 
-                    page={pagina} 
+                  <Pagination
+                    page={pagina}
                     count={Math.ceil(totalCount / Environment.LIMITE_DE_LINHAS)}
-                    onChange={(_, newPage)=> setSearchParams({ busca, pagina: newPage.toString() }, { replace: true })} 
+                    onChange={(_, newPage) =>
+                      setSearchParams(
+                        { busca, pagina: newPage.toString() },
+                        { replace: true }
+                      )
+                    }
                   />
                 </TableCell>
               </TableRow>
