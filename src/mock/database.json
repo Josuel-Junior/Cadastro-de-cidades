@@ -1,18 +1,6 @@
 {
   "pessoas": [
     {
-      "id": 3,
-      "email": "Josuel@gmail.com",
-      "cidadeId": 1,
-      "nomeCompleto": "Marcelo Cesar"
-    },
-    {
-      "id": 4,
-      "email": "Josuel@gmail.com",
-      "cidadeId": 1,
-      "nomeCompleto": "Rogerio mendes"
-    },
-    {
       "id": 5,
       "email": "Josuel@gmail.com",
       "cidadeId": 1,
