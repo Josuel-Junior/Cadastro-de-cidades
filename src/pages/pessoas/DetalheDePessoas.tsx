@@ -4,8 +4,10 @@ import { useParams,useNavigate } from "react-router-dom";
 import { LayoutBaseDePagina } from "../../shared/layouts";
 import { FerramentasDeDetalhe } from "../../shared/components";
 import { PessoasService } from "../../shared/services/api/pessoas/PessoasService";
+import { Form } from "@unform/web";
 
-import {LinearProgress} from "@mui/material";
+import { VtextFiel } from "../../shared/forms";
+
 
 
 
@@ -72,10 +74,15 @@ export const DetalheDePessoas: React.FC = () => {
       }
     >
 
-      {isLoading && (
-        <LinearProgress variant="indeterminate"/>
-      )}
-      <p>DetalheDePessoas {id}</p>
+      <Form onSubmit={console.log}>
+        <VtextFiel
+          name="NomeCompleto"
+          
+        />
+
+
+      </Form>
+      
     </LayoutBaseDePagina>
   );
   
