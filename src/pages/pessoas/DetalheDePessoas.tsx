@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useState, useRef} from "react";
 
 import { useParams,useNavigate } from "react-router-dom";
 import { LayoutBaseDePagina } from "../../shared/layouts";
@@ -7,14 +7,22 @@ import { PessoasService } from "../../shared/services/api/pessoas/PessoasService
 import { Form } from "@unform/web";
 
 import { VtextFiel } from "../../shared/forms";
+import { FormHandles } from "@unform/core";
 
 
+interface IFormData{
+  email: string;
+  cidadeId: string;
+  nomeComplete: string;
+}
 
 
 export const DetalheDePessoas: React.FC = () => {
 
   const {id = "nova"} = useParams<"id">();
   const navigate = useNavigate();
+
+  const formRef = useRef<FormHandles>(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [nome, setNome] = useState("");
@@ -37,8 +45,8 @@ export const DetalheDePessoas: React.FC = () => {
     }
   },[id]);
 
-  const handleSave = () => {
-    console.log("save");
+  const handleSave = (dados: IFormData) => {
+    console.log(dados);
   };
   const handleDelete = (id: number) => {
     if (confirm("Realmente deseja apagar?")) {
@@ -65,22 +73,23 @@ export const DetalheDePessoas: React.FC = () => {
           mostrarBotaoNovo={id !== "nova"}
           mostrarBotaoApagar={id !== "nova"}
 
-          aoClicarEmSalvar={handleSave}
-          aoClicarEmSalvarEFechar={handleSave}
-          aoClicarEmApagar={()=>handleDelete(Number(id))}
           aoClicarEmVoltar={()=>navigate("/pessoas")}
+          aoClicarEmApagar={()=>handleDelete(Number(id))}
           aoClicarEmNovo={()=>navigate("/pessoas/detalhe/nova")}
+          aoClicarEmSalvar={()=>formRef.current?.submitForm()}
+          aoClicarEmSalvarEFechar={()=>formRef.current?.submitForm()}
         />
       }
     >
+     
 
-      <Form onSubmit={console.log}>
-        <VtextFiel
-          name="NomeCompleto"
-          
-        />
+      <Form ref={formRef} onSubmit={handleSave}>
 
+        <VtextFiel name="NomeCompleto"/>
+        <VtextFiel name="email"/>
+        <VtextFiel name="cidadeId"/>
 
+        <button type="submit">Submit</button>
       </Form>
       
     </LayoutBaseDePagina>
