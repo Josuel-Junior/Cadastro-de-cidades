@@ -1,52 +1,84 @@
-import {useEffect, useState, useRef} from "react";
+import { useEffect, useState } from "react";
 
-import { useParams,useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { LayoutBaseDePagina } from "../../shared/layouts";
 import { FerramentasDeDetalhe } from "../../shared/components";
 import { PessoasService } from "../../shared/services/api/pessoas/PessoasService";
-import { Form } from "@unform/web";
 
-import { VtextFiel } from "../../shared/forms";
-import { FormHandles } from "@unform/core";
+import { Box, Paper } from "@mui/material";
 
+import { VtextFiel, VForm, useVForm } from "../../shared/forms";
 
-interface IFormData{
+interface IFormData {
   email: string;
-  cidadeId: string;
-  nomeComplete: string;
+  cidadeId: number;
+  nomeCompleto: string;
 }
 
-
 export const DetalheDePessoas: React.FC = () => {
-
-  const {id = "nova"} = useParams<"id">();
+  const { id = "nova" } = useParams<"id">();
   const navigate = useNavigate();
 
-  const formRef = useRef<FormHandles>(null);
+  const { formRef, save, saveAndClose, isSaveAndClose } = useVForm();
 
   const [isLoading, setIsLoading] = useState(false);
   const [nome, setNome] = useState("");
 
-  useEffect(()=>{
-    if(id !== "nova"){
+  useEffect(() => {
+    if (id !== "nova") {
       setIsLoading(true);
-      PessoasService.getById(Number(id)).then((result)=>{
+      PessoasService.getById(Number(id)).then((result) => {
         setIsLoading(false);
         console.log(id);
-        if(result instanceof Error){
+        if (result instanceof Error) {
           alert(result.message);
           // alert trava a fila de execução
           navigate("/pessoas");
-        }else{
+        } else {
           setNome(result.nomeCompleto);
-          console.log(result);
+          //setData e do Unform
+          formRef.current?.setData(result);
         }
       });
+    } else {
+      formRef.current?.setData({
+        nomeCompleto: "",
+        email: "",
+        cidadeId: "",
+      });
     }
-  },[id]);
+  }, [id]);
 
   const handleSave = (dados: IFormData) => {
-    console.log(dados);
+    setIsLoading(true);
+    if (id === "nova") {
+      PessoasService.create(dados).then((result) => {
+        setIsLoading(false);
+        if (result instanceof Error) {
+          alert(result.message);
+        } else {
+          if (isSaveAndClose()) {
+            navigate("/pessoas");
+          } else {
+            navigate(`/pessoas/detalhe/${result}`);
+          }
+        }
+      });
+    } else {
+      PessoasService.updateById(Number(id), { id: Number(id), ...dados }).then(
+        (result) => {
+          console.log(result);
+          setIsLoading(false);
+          if (result instanceof Error) {
+            alert(result.message);
+          } else {
+            if (isSaveAndClose()) {
+              navigate("/pessoas");
+            }
+          }
+        }
+      );
+    }
   };
   const handleDelete = (id: number) => {
     if (confirm("Realmente deseja apagar?")) {
@@ -60,11 +92,9 @@ export const DetalheDePessoas: React.FC = () => {
       });
     }
   };
- 
 
   return (
-
-    <LayoutBaseDePagina 
+    <LayoutBaseDePagina
       title={id === "nova" ? "NovaPessoa" : nome}
       barraDeFerramentas={
         <FerramentasDeDetalhe
@@ -72,27 +102,23 @@ export const DetalheDePessoas: React.FC = () => {
           mostrarBotaoSalvarEFechar
           mostrarBotaoNovo={id !== "nova"}
           mostrarBotaoApagar={id !== "nova"}
-
-          aoClicarEmVoltar={()=>navigate("/pessoas")}
-          aoClicarEmApagar={()=>handleDelete(Number(id))}
-          aoClicarEmNovo={()=>navigate("/pessoas/detalhe/nova")}
-          aoClicarEmSalvar={()=>formRef.current?.submitForm()}
-          aoClicarEmSalvarEFechar={()=>formRef.current?.submitForm()}
+          aoClicarEmSalvar={save}
+          aoClicarEmVoltar={() => navigate("/pessoas")}
+          aoClicarEmApagar={() => handleDelete(Number(id))}
+          aoClicarEmNovo={() => navigate("/pessoas/detalhe/nova")}
+          aoClicarEmSalvarEFechar={saveAndClose}
         />
       }
     >
-     
-
-      <Form ref={formRef} onSubmit={handleSave}>
-
-        <VtextFiel name="NomeCompleto"/>
-        <VtextFiel name="email"/>
-        <VtextFiel name="cidadeId"/>
-
-        <button type="submit">Submit</button>
-      </Form>
-      
+      <VForm ref={formRef} onSubmit={handleSave}>
+        <Box margin={1} display="flex" flexDirection="column" component={Paper} variant="outlined">
+          
+          <VtextFiel placeholder="Nome Completo" name="nomeCompleto" />
+          <VtextFiel placeholder="Email" name="email" />
+          <VtextFiel placeholder="Cidade Id" name="cidadeId" />
+          <button type="submit">Submit</button>
+        </Box>
+      </VForm>
     </LayoutBaseDePagina>
   );
-  
 };

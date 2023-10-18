@@ -72,7 +72,7 @@ const getById = async (id: number): Promise<IDetalhePessoa | Error> => {
 
 };
 const create = async (dados: Omit<IDetalhePessoa, "id">): Promise<number | Error> => {
-  // Com Omit o ID deixar de ser obrigatorio  
+  // Com Omit o ID deixa de ser obrigatorio  
 
   try {
   //  Pra onde vai | quais são os dados
@@ -93,7 +93,7 @@ const create = async (dados: Omit<IDetalhePessoa, "id">): Promise<number | Error
 };
 const updateById = async (id: number, dados:IDetalhePessoa): Promise<void | Error> => {
   try {
-    await Api.put(`/pessoas/${id}`, dados);
+    await Api.put(`http://localhost:3333/pessoas/${id}`, dados);
   } catch (error) {
     console.error(error);
     return new Error(
